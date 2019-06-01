@@ -2,10 +2,10 @@ import random
 import time
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from timeit import default_timer
+
 random.seed(100000)
 
-##--------------------------------------------------------------------------
-## Island Class-----------------------------------------------------------------------------------
 class Island (object):
     """Island
     a 3D grid where zero value indicates position not occupied.
@@ -34,15 +34,12 @@ class Island (object):
         # Dictionaries are used to make appending and extracting data simpler.
         self.life_dict = {"W":[], "E":[], "r":[], "p":[]}                          
         self.offspring_dict = {"W":[], "E":[], "r":[], "p":[]}
-
-    ## --------------------------------------------------------------------------------
+        
     def size(self):
         ''' Return size of the island: three dimension.
         '''
         return self.grid_size_x,self.grid_size_y,self.grid_size_z         
     
-
-    ## --------------------------------------------------------------------------------
     def __str__(self):
         ''' String representation for printing.
         (0,0,0) is at the lower left corner of the bottom layer.
@@ -66,8 +63,6 @@ class Island (object):
             s+="\n"                                    # Separate every 2D-layer with a new line.
         return(s)
     
-
-    ## --------------------------------------------------------------------------------
     def register(self,obj):
         ''' Register animal or plant with island, i.e. put it at the
         animal/plant's coordinates.
@@ -77,8 +72,6 @@ class Island (object):
         z = obj.z
         self.grid_3D[z][y][x] = obj
 
-
-    ## ------------------------------------------------------------------------------
     def remove(self,obj):
         ''' Remove animal or plant from island by making the animal's 
         position to be 0.
@@ -87,9 +80,7 @@ class Island (object):
         y = obj.y
         z = obj.z
         self.grid_3D[z][y][x] = 0
-
-
-    ## -----------------------------------------------------------------------------
+        
     def occupant(self,x,y,z):
         '''Return the animal at location (x,y,z).
         '''
@@ -99,13 +90,10 @@ class Island (object):
         else:
             return -1  # outside island boundary      
 
-
-    ## -----------------------------------------------------------------------------
     def init_envir(self,wolf_count, eagle_count, rabbit_count, pigeon_count,
                        grass_count, fruit_count):
         ''' Place the initial animals on the island.
         '''
-        #start_time = time.time()
         # The while-loop continues until  unoccupied positions equalling to
         # wolf_count, eagle_count are found.
         # If the dimensions of the Island are insufficient to hold all the animals,
@@ -116,12 +104,11 @@ class Island (object):
            wolf_count + rabbit_count + pigeon_count + eagle_count \
                       +  grass_count + fruit_count <= \
                    self.grid_size_x * self.grid_size_y * self.grid_size_z:
-            #start_time=time.time()
-        # The while-loop continues until  unoccupied positions equalling to
-        # wolf_count, eagle_count are found.
-        # Same while loop for all four animals.
-        # The while-loop continues until  unoccupied positions equalling to
-        # wolf_count, eagle_count are found.
+            # The while-loop continues until  unoccupied positions equalling to
+            # wolf_count, eagle_count are found.
+            # Same while loop for all four animals.
+            # The while-loop continues until  unoccupied positions equalling to
+            # wolf_count, eagle_count are found.
             loc_set = set() # Used to avoid repeats.
             count = 0
             while count < wolf_count:
@@ -193,12 +180,9 @@ class Island (object):
                     new_fruit=Fruit(self,x,y,z)
                     loc_set.add((x,y,z))
                     count += 1
-                    self.register(new_fruit)
-            #print("init_animal took {}s".format(time.time()-start_time))           
+                    self.register(new_fruit)        
         else: print("Insufficient Island Dimensions")
 
-
-    ## -----------------------------------------------------------------------------
     def clear_all_moved_flags(self):
         ''' Animals have a moved flag to indicated they moved this turn.
         Clear that so they can move at the next clock tick.
@@ -210,8 +194,6 @@ class Island (object):
                     if isinstance(self.grid_3D[z][y][x], Animal): 
                         self.grid_3D[z][y][x].clear_moved_flag()
                         
-                        
-    ##------------------------------------------------------------------------
     def get_locations(self):
         scatter_dict = {"W":[[],[],[],[],[]],"E":[[],[],[],[],[]],
                         "p":[[],[],[],[],[]],"r":[[],[],[],[],[]],
@@ -237,9 +219,7 @@ class Island (object):
                         scatter_dict[instance.name][3].append(instance.life_time)
                         scatter_dict[instance.name][4].append(instance.eaten)
         return scatter_dict
-        
-        
-    ## -----------------------------------------------------------------------------
+       
     def count_animal(self, add_stat=False):
         ''' Count the number of a specified type of animal on the island,
         and the statistics of the animals can be appended
@@ -269,9 +249,7 @@ class Island (object):
         if not add_stat:
             self.wolf_count,    self.eagle_count =   wolf_count,  eagle_count
             self.rabbit_count, self.pigeon_count = rabbit_count, pigeon_count  
-
-
-    ## -----------------------------------------------------------------------------
+            
     def cal_stat(self, type):    
         """ Calculates all the required statistics for a type of animal and
         return the result as a tuple."""
@@ -297,13 +275,13 @@ class Island (object):
             offspring_avg = sum(offspring_list)/len(offspring_list)
             life_avg = sum(life_list)/len(life_list)
 
-        # Calculate the median for the number of offspring and life_time.
-        # Need to consider two cases:
-        # 1. If the length of the list is an odd number,
-        #    the median is the middle number of that list
-        #    (Python indexing starts at 0).
-        # 2. If the length of the list is an even number,
-        #    the median is the average between the two middle numbers.
+            # Calculate the median for the number of offspring and life_time.
+            # Need to consider two cases:
+            # 1. If the length of the list is an odd number,
+            #    the median is the middle number of that list
+            #    (Python indexing starts at 0).
+            # 2. If the length of the list is an even number,
+            #    the median is the average between the two middle numbers.
             if len(offspring_list)%2==1:
                 offspring_med = offspring_list[int((len(offspring_list)-1)/2)]
             else:
@@ -326,8 +304,6 @@ class Island (object):
         return life_num, life_max, life_min, life_avg, life_med,\
                offspring_min, offspring_max, offspring_avg, offspring_med
 
-
-## Plant-------------------------------------------------------------------------
 class Plant(object):
     def __init__(self, island, x=0, y=0, z=0, s="P"):
         """ Initialise a plant class as food for Preys.
@@ -339,22 +315,16 @@ class Plant(object):
         self.eaten_time = 0
         self.eaten = False
     
-    
-    ##-----------------------------------------------------------------------
     def __str__(self):
         """ Prints the name of the Plant.
         """
         return self.name
     
-    
-    ## -----------------------------------------------------------------------------
     def position(self):
         ''' Return coordinates of the animal's current position.
         '''
         return self.x, self.y, self.z
         
-        
-    ##-----------------------------------------------------------------------
     def grow(self):
         """ When a Plant grows back, its eaten flage becomes False.
         """
@@ -363,8 +333,6 @@ class Plant(object):
             self.eaten = False
             self.eaten_time = 0
     
-    
-    ##-------------------------------------------------------------------------
     def clock_tick(self):
         ''' Grass updates life_time.
         '''
@@ -376,8 +344,6 @@ class Plant(object):
         if self.life_time % (24*self.growth_time) == 0 and \
            random.randint(0,2)==1: self.eaten = True
 
-
-##----------------------------------------------------------------------------
 class Grass(Plant):
     def __init__(self, island, x=0, y=0, z=0, s="g"):
         """ Grass is a subclass of Plant; it can be eaten by Rabbit.
@@ -385,8 +351,6 @@ class Grass(Plant):
         Plant.__init__(self, island, x, y, z, s)
         self.growth_time = self.regrowth
     
-    
-##---------------------------------------------------------------------------
 class Fruit(Plant):
     def __init__(self, island, x=0, y=0, z=0, s="f"):
         """ Fruit is a subclass of Plant; it can be eaten by Prey.
@@ -394,9 +358,6 @@ class Fruit(Plant):
         Plant.__init__(self, island, x, y, z, s)
         self.growth_time = self.regrowth
         
-
-##--------------------------------------------------------------------------
-## Animal Class---------------------------------------------------------------------------------------------------
 class Animal (object):
     def __init__(self, island, x=0, y=0, z=0, s="A", s_range=2):
         """ Initialize an Animal class, with their positions and names.
@@ -418,22 +379,16 @@ class Animal (object):
                           set(self.check_grid_list))
         assert len(self.search_set)==98, "Error in search_set"
         
-
-    ## -----------------------------------------------------------------------------
     def __str__(self):
         """ Prints the name of the animal.
         """
         return self.name
     
-
-    ## -----------------------------------------------------------------------------
     def position(self):
         ''' Return coordinates of the animal's current position.
         '''
         return self.x, self.y, self.z
 
-
-    ## -----------------------------------------------------------------------------
     def check_grid(self, type_looking_for=int):
         ''' Look randomly at all possible locations from the animal's location
         and return a location that is presently occupied by an object
@@ -504,8 +459,6 @@ class Animal (object):
                     return_dict[(x,y,z)]=self.island.occupant(x,y,z).name
             return return_dict
     
-    
-    ##-------------------------------------------------------------------------    
     def get_position(self,coordinate=(0,0,0),other_type=None):
         assert isinstance(coordinate, tuple), "Error in get_position"
         position_set = set()
@@ -530,8 +483,7 @@ class Animal (object):
                            position_set.add((x, y, z))
         return position_set
         
-    
-    ## Secondary and more strategic move method-------------------------
+    ## Secondary and more strategic move method
     def move_towards(self, search_type=int):
         """ Search for prey or predator at two grids away.
         If one present, move according to type. 
@@ -559,8 +511,6 @@ class Animal (object):
                     self.moved=True
                     break
     
-    
-    ##--------------------------------------------------------------------
     def move_away(self, search_type=int):
         """ A Prey looks for nearby (i.e. a grid away) Predators and move
         away from them.
@@ -589,9 +539,7 @@ class Animal (object):
                         self.island.register(self) # Register instance at new coordinates.
                         self.moved=True
                         break
-
-    
-    ## -----------------------------------------------------------------------------
+                        
     def move(self):
         ''' Move to an open, neighbouring position
         '''
@@ -611,15 +559,11 @@ class Animal (object):
             self.island.register(self) # Register instance at new coordinates.
             self.moved=True            # Change the moved flag.
 
-
-    ## -----------------------------------------------------------------------------
     def clear_moved_flag(self):
         """ Change the animal's moved attribute to False.
         """
         self.moved=False
 
-
-    ## -----------------------------------------------------------------------------
     def breed(self):
         ''' Breed a new Animal at an empty neighbouring location.
         If no empty position available, wait.
@@ -634,15 +578,11 @@ class Animal (object):
                 the_class = self.__class__
                 new_animal = the_class(
                            self.island,x=location[0],y=location[1],z=location[2])
-                #new_animal.move_clock = self.move_clock
                 self.island.register(new_animal)    
                 self.offspring += 1
                 #print('{} Breeding {},{},{}'.format(
                 #       str(self.name),self.x,self.y,self.z)) # debug
 
-
-##----------------------------------------------------------------------------
-## Prey Class--------------------------------------------------------------------
 class Prey(Animal):
     def __init__(self, island, x=0,y=0,z=0,s="Prey"):
         """Initialise the Prey class as a subclass of Animal.
@@ -650,8 +590,6 @@ class Prey(Animal):
         """
         Animal.__init__(self,island,x,y,z,s)
            
-
-    ## -----------------------------------------------------------------------------
     def clock_tick(self):
         '''Prey updates its local breed clock and life_time
         '''
@@ -684,25 +622,19 @@ class Prey(Animal):
                 #       location[0],location[1],location[2])) # debug
                 self.island.occupant(plant[0],plant[1],plant[2]).eaten=True
                 self.starve_clock=self.starve_time
-                #self.moved=True
-    
-    ## ---------------------------------------------------------------------
+                
     def reposition(self):
         """ Move away from predators that are nearby. 
         """
         self.move_away(search_type=Predator) or \
         self.move_towards(search_type=Plant)
 
-##--------------------------------------------------------------------------
-## Predator Class-----------------------------------------------------------------------------------
 class Predator(Animal):
     def __init__(self, island, x=0,y=0,z=0,s="Pred"):
         """Initialise the Predator class as a subclass of Animal.
         """        
         Animal.__init__(self,island,x,y,z,s)
 
-
-    ## Update clocks--------------------------------------------------------
     def clock_tick(self):
         ''' Predator updates breeding, starving and life_time
         '''
@@ -722,8 +654,6 @@ class Predator(Animal):
             #print('Death, {} at {},{},{}, life={}'.format(
             #       self.name,self.x,self.y,self.z,self.life_time)) # Debug
             
-            
-     ## Hunt prey method-------------------------------------------------------
     def hunt(self, prey_type):
         ''' Predator looks at the offset locations for Prey.
         If found, it moves to that location and updates its starve clock.
@@ -761,9 +691,6 @@ class Predator(Animal):
                 self.starve_clock=self.starve_time
                 self.moved=True
 
-
-##--------------------------------------------------------------------------        
-## Eagle class---------------------------------------------------------------------------------------------------
 class Eagle (Predator):
     def __init__(self, island, x=0, y=0, z=0, s="E"):
         """Initialise the Eagle class as a subclass of Predator.
@@ -789,9 +716,6 @@ class Eagle (Predator):
         """
         self.move_towards(search_type=Prey) or self.move_away(search_type=Wolf)
         
-
-##--------------------------------------------------------------------------        
-## Wolf class------------------------------------------------------------------------------------------------
 class Wolf (Predator):
     def __init__(self, island, x=0, y=0, z=0, s="W"):
         """Initialise the Wolf class as a subclass of Predator.
@@ -806,22 +730,19 @@ class Wolf (Predator):
         #self.move_clock, self.life_time, self.offspring = 0, 0, 0
         
 
-    ## Eat method based on the eat method------------------------------------------------------------------------------
+    ## Eat method based on the eat method
     def eat(self):
         ''' Wolves can eat rabbits, eagles and pigeons.
         '''
         self.hunt(prey_type=Prey) or self.hunt(prey_type=Eagle)
     
     
-    ## Secondary move method------------------------------------------------
+    ## Secondary move method
     def reposition(self):
         """ Move towards preys that are two grids away. 
         """
         self.move_towards(search_type=Prey) or self.move_towards(search_type=Eagle)
 
-
-##-------------------------------------------------------------------------
-## Rabbit class--------------------------------------------------------------------------------------------
 class Rabbit (Prey):
     def __init__(self, island, x=0, y=0, z=0, s="r"):
         """Initialise the Rabbit class as a subclass of Prey.
@@ -836,8 +757,7 @@ class Rabbit (Prey):
 
     def eat(self):
         self.feed(plant_type=Plant)
-##--------------------------------------------------------------------------
-## Pigeon class--------------------------------------------------------------------------------------------
+        
 class Pigeon (Prey):
     def __init__(self, island, x=0, y=0, z=0, s="p"):
         """Initialise the Rabbit class as a subclass of Prey.
@@ -852,8 +772,7 @@ class Pigeon (Prey):
 
     def eat(self):
         self.feed(plant_type=Fruit)
-##--------------------------------------------------------------------------    
-## Animation function----------------------------------------------------------
+        
 def animation(data, ax, plot=None,x=0,y=0,z=0):
     assert isinstance(data,dict)
     if plot:
@@ -884,11 +803,9 @@ def animation(data, ax, plot=None,x=0,y=0,z=0):
                           s=size_dict[name])
     try:
         plt.pause(0.01) # Pause the plot for it to update.
-    except: pass
+    except Exception as e: print(e) # do some logging 
     return plot
 
-
-## Statistics printing function------------------------------------------------
 def print_stat(island=None, animal_list=[]):
     """ Add the data of the animals that are still alive 
     to appropriate Island attributes.
@@ -910,8 +827,6 @@ def print_stat(island=None, animal_list=[]):
     #print("\nlife", island.life_dict,"\noffspring",island.offspring_dict)  # Debug
     #print(island)
 
-
-## Function for plotting animal statistics-----------------------------------------------------
 def stat_plot(W_list=[], E_list=[], p_list=[], r_list=[]):
     fig = plt.figure()
     ax  = fig.add_subplot(1,1,1)
@@ -926,8 +841,6 @@ def stat_plot(W_list=[], E_list=[], p_list=[], r_list=[]):
     plt.show()
 
 
-##-------------------------------------------------------------------------
-## Main Program for simulation------------------------------------------------------------------------------------------------
 def main(eagle_breed_time =13, eagle_starve_time=13, initial_eagles=13,
          wolf_breed_time  =15,  wolf_starve_time=12, initial_wolves=10,
          eagle_max_life   =45, wolf_max_life    =40,
@@ -977,7 +890,6 @@ def main(eagle_breed_time =13, eagle_starve_time=13, initial_eagles=13,
         plt.show()
         W = None # Create an artist on which the scatter points are drawn. 
 
-    ## Simulation Loop-----------------------------------------------------------------------------
     # Simulate using a for loop. 
     # Every clock tick, look at every position of the Island,
     # do tasks if there is an animal there.
@@ -1026,7 +938,7 @@ def main(eagle_breed_time =13, eagle_starve_time=13, initial_eagles=13,
                    land.wolf_count, land.eagle_count))
 
         
-    ## Statistics analysis and printing-----------------------------------------
+    ## Statistics analysis and printing
     if print_statistics:
         print_stat(island=land,animal_list=["W","E","p","r"])
     
@@ -1042,9 +954,21 @@ def main(eagle_breed_time =13, eagle_starve_time=13, initial_eagles=13,
         stat_plot(W_list=wolf_list, E_list=eagle_list, 
                   p_list=pigeon_list, r_list=rabbit_list)
 
+class Timer(object):
+    def __init__(self, ctx=""):
+        self.ctx = ctx
+        self.timer = default_timer
+        
+    def __enter__(self):
+        self.start = self.timer()
+        logging.info("start %s", self.ctx)
+        return self
+        
+    def __exit__(self, *args):
+        end = self.timer()
+        self.elapsed = end - self.start # seconds
+        logging.info("%s took %d seconds", self.ctx, self.elapsed)
 
-##--------------------------------------------------------------------------
-## Calling the main program-----------------------------------------------------
-start = time.time() # To determine the efficiency of the program.
-main()
-print("total took {}s".format(time.time()-start)) # Efficiency test.
+if __name__ == "__main__":
+    with Timer("Pred-Prey Similation"):
+        main()
