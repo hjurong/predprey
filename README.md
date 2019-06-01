@@ -2,11 +2,11 @@
 A Predator/Prey Simulation in Python
 
 ## simulation outputs
-### Statistics
-![Stats](/doc/pred_prey_stats.png)
-
 ### Animation
 ![Anim](/doc/pred_prey_animation.gif)
+
+### Statistics
+![Stats](/doc/pred_prey_stats.png)
 
 ## description
 A simple simulation written Python2 with following characteristics:
